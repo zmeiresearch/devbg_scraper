@@ -40,6 +40,7 @@ company_lists = [
         "https://dev.bg/company/paid-leave/25-dni/",
         "https://dev.bg/company/work-hours/chastichno-guvkavo/",
         "https://dev.bg/company/work-hours/fiksirano/",
+        "https://dev.bg/company/work-hours/iztsyalo-guvkavo/",
         "https://dev.bg/company/select/indfintech/",
         "https://dev.bg/company/select/indedutech/",
         "https://dev.bg/company/select/indgaming/",
@@ -88,13 +89,17 @@ def download_company_description(company_url_list):
     company_info.append(("Name", "URL", "Established", "Present_In_BG_From"))
     with alive_bar(len(company_url_list)) as bar:
         for url in company_url_list:
-            r = urllib.request.urlopen(url)
-            s = BeautifulSoup(r, 'lxml', from_encoding=r.info().get_param('charset'))
-            name = s.find("h1", class_="company-heading").get_text()
-            info = s.find("div", class_="company-info")
-            established = info.select('div:-soup-contains("Година на основаване")')[0].select('p:nth-of-type(2)')[0].get_text()
-            in_bg = info.select('div:-soup-contains("От кога има офис в България")')[0].select('p:nth-of-type(2)')[0].get_text()
-            company_info.append((name, url, established, in_bg))
+            try:
+                r = urllib.request.urlopen(url)
+                s = BeautifulSoup(r, 'lxml', from_encoding=r.info().get_param('charset'))
+                name = s.find("h1", class_="company-heading").get_text()
+                info = s.find("div", class_="company-info")
+                established = info.select('div:-soup-contains("Година на основаване")')[0].select('p:nth-of-type(2)')[0].get_text()
+                in_bg = info.select('div:-soup-contains("От кога има офис в България")')[0].select('p:nth-of-type(2)')[0].get_text()
+                company_info.append((name, url, established, in_bg))
+            except Exception as e:
+                click.echo(f'Excetion parsing {url}: {format(e)}')
+
             bar()
             time.sleep(2)
     return company_info
