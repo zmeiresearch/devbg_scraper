@@ -13,8 +13,6 @@ import time
 import csv
 from alive_progress import alive_bar
 
-work_dir = os.path.join(os.getcwd(), "tmp")
-
 company_lists_test = [
         "https://dev.bg/company/it-employees/10-30/",
         "https://dev.bg/company/select/locationruse/",
@@ -38,6 +36,8 @@ company_lists = [
         "https://dev.bg/company/company-activity/survis-kompanii/",
         "https://dev.bg/company/company-activity/vnedrjavane-na-softuerni-sistemi/",
         "https://dev.bg/company/paid-leave/20-dni/",
+        "https://dev.bg/company/paid-leave/21-25-dni/",
+        "https://dev.bg/company/paid-leave/25-dni/",
         "https://dev.bg/company/work-hours/chastichno-guvkavo/",
         "https://dev.bg/company/work-hours/fiksirano/",
         "https://dev.bg/company/select/indfintech/",
@@ -57,7 +57,7 @@ blacklist = [
 
 company_regex = re.compile("https:\/\/dev\.bg\/company\/(.+[a-zA-Z0-9])\/", re.IGNORECASE)
 
-# company URLs look like this https://dev.bg/company/dataart/ - i.e. https://dev.bg/company//
+# company URLs look like this https://dev.bg/company/dataart/ - i.e. https://dev.bg/company/*/
 def is_company_url(url):
     if validators.url(url):
         if re.match(company_regex, url):
@@ -77,9 +77,11 @@ def get_company_urls(company_lists):
             if is_company_url(l):
                 #click.echo(f"Found company url: {l}")
                 company_urls.append(l)
+        click.echo(f'Found {len(company_urls)} so far')
     nodups = list(dict.fromkeys(company_urls))
     click.echo(f'Found {len(nodups)} companies')
-    return nodups[:12]
+    #return nodups[:12]
+    return nodups
 
 def download_company_description(company_url_list):
     company_info = []
